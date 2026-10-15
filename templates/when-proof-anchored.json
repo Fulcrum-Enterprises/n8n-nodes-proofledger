@@ -1,0 +1,47 @@
+{
+  "name": "ProofLedger: when a proof is anchored",
+  "nodes": [
+    {
+      "parameters": {
+        "includeTestEvents": false
+      },
+      "id": "7c1d2e3f-4a5b-4c6d-8e7f-9a0b1c2d3e01",
+      "name": "ProofLedger Trigger",
+      "type": "n8n-nodes-proofledger.proofLedgerTrigger",
+      "typeVersion": 1,
+      "position": [0, 0],
+      "webhookId": "7c1d2e3f-4a5b-4c6d-8e7f-9a0b1c2d3e01",
+      "notes": "Activating this workflow registers a webhook on your ProofLedger account. Every delivery's signature is checked before anything runs."
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "f1", "name": "proof_id", "value": "={{ $json.data.proof.id }}", "type": "number" },
+            { "id": "f2", "name": "external_id", "value": "={{ $json.data.proof.external_id }}", "type": "string" },
+            { "id": "f3", "name": "sha256", "value": "={{ $json.data.proof.sha256 }}", "type": "string" },
+            { "id": "f4", "name": "filename", "value": "={{ $json.data.proof.filename }}", "type": "string" },
+            { "id": "f5", "name": "chain_tx", "value": "={{ $json.data.proof.chain_tx }}", "type": "string" },
+            { "id": "f6", "name": "anchored_at", "value": "={{ $json.data.proof.polygon_anchored_at }}", "type": "string" },
+            { "id": "f7", "name": "certificate_url", "value": "={{ $json.data.proof.certificate_url }}", "type": "string" },
+            { "id": "f8", "name": "verification_url", "value": "={{ $json.data.proof.verification_url }}", "type": "string" },
+            { "id": "f9", "name": "bundle", "value": "={{ $json.data.bundle }}", "type": "object" }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      },
+      "id": "7c1d2e3f-4a5b-4c6d-8e7f-9a0b1c2d3e02",
+      "name": "Tidy the event",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [220, 0],
+      "notes": "One flat item per anchored proof. Connect anything here: update the record in your database, email the certificate link, drop the bundle into storage."
+    }
+  ],
+  "connections": {
+    "ProofLedger Trigger": { "main": [[{ "node": "Tidy the event", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "meta": { "templateCredsSetupCompleted": false }
+}

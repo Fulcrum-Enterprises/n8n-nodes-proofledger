@@ -1,0 +1,106 @@
+{
+  "name": "ProofLedger: anchor a file and save its proof bundle",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "4b4f9c2e-1a5d-4f0e-9d2b-7a8c3e5f1a01",
+      "name": "When clicking Test workflow",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "fileSelector": "/data/evidence.pdf",
+        "options": {}
+      },
+      "id": "4b4f9c2e-1a5d-4f0e-9d2b-7a8c3e5f1a02",
+      "name": "Read File",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [220, 0],
+      "notes": "Point fileSelector at the file to anchor. Swap this node for any node that produces a binary field (Google Drive download, S3, HTTP Request, a form upload)."
+    },
+    {
+      "parameters": {
+        "resource": "proof",
+        "operation": "createFromFile",
+        "binaryPropertyName": "data",
+        "additionalFields": {
+          "externalId": "={{ $binary.data.fileName }}"
+        }
+      },
+      "id": "4b4f9c2e-1a5d-4f0e-9d2b-7a8c3e5f1a03",
+      "name": "Anchor the hash",
+      "type": "n8n-nodes-proofledger.proofLedger",
+      "typeVersion": 1,
+      "position": [440, 0],
+      "notes": "Hashes the file inside n8n and sends only the SHA-256. External ID = the file name, so running this twice on the same file returns the same proof."
+    },
+    {
+      "parameters": {
+        "resume": "timeInterval",
+        "amount": 90,
+        "unit": "seconds"
+      },
+      "id": "4b4f9c2e-1a5d-4f0e-9d2b-7a8c3e5f1a04",
+      "name": "Wait for the anchor",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [660, 0],
+      "webhookId": "4b4f9c2e-1a5d-4f0e-9d2b-7a8c3e5f1a04",
+      "notes": "Polygon anchoring usually lands within a minute. For a no-wait design use the ProofLedger Trigger template instead."
+    },
+    {
+      "parameters": {
+        "resource": "proof",
+        "operation": "getBundle",
+        "proofId": "={{ $('Anchor the hash').item.json.id }}"
+      },
+      "id": "4b4f9c2e-1a5d-4f0e-9d2b-7a8c3e5f1a05",
+      "name": "Get the bundle",
+      "type": "n8n-nodes-proofledger.proofLedger",
+      "typeVersion": 1,
+      "position": [880, 0]
+    },
+    {
+      "parameters": {
+        "operation": "toJson",
+        "mode": "each",
+        "binaryPropertyName": "data",
+        "options": {
+          "fileName": "={{ $('Read File').item.binary.data.fileName }}.proof.json"
+        }
+      },
+      "id": "4b4f9c2e-1a5d-4f0e-9d2b-7a8c3e5f1a06",
+      "name": "Bundle as a file",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [1100, 0]
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "={{ $('Read File').item.binary.data.directory }}/{{ $('Read File').item.binary.data.fileName }}.proof.json",
+        "dataPropertyName": "data",
+        "options": {}
+      },
+      "id": "4b4f9c2e-1a5d-4f0e-9d2b-7a8c3e5f1a07",
+      "name": "Save next to the file",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [1320, 0],
+      "notes": "Anyone can verify the file against this .proof.json offline: pip install verify-proof, then verify-proof verify <file> --proof <file>.proof.json"
+    }
+  ],
+  "connections": {
+    "When clicking Test workflow": { "main": [[{ "node": "Read File", "type": "main", "index": 0 }]] },
+    "Read File": { "main": [[{ "node": "Anchor the hash", "type": "main", "index": 0 }]] },
+    "Anchor the hash": { "main": [[{ "node": "Wait for the anchor", "type": "main", "index": 0 }]] },
+    "Wait for the anchor": { "main": [[{ "node": "Get the bundle", "type": "main", "index": 0 }]] },
+    "Get the bundle": { "main": [[{ "node": "Bundle as a file", "type": "main", "index": 0 }]] },
+    "Bundle as a file": { "main": [[{ "node": "Save next to the file", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "meta": { "templateCredsSetupCompleted": false }
+}
