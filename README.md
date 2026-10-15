@@ -74,6 +74,8 @@ npm run lint       # n8n's community-node rules
 npm test           # signature verification unit tests (needs a build)
 ```
 
+Releases after the first go through GitHub Actions with npm provenance, as n8n requires for verified nodes since May 2026: `npm run release` lints, builds, bumps the version, tags and pushes, and `.github/workflows/publish.yml` publishes the tag. One-time setup on npmjs.com: package settings → Trusted Publishers → GitHub Actions, owner `Fulcrum-Enterprises`, repo `n8n-nodes-proofledger`, workflow `publish.yml`.
+
 The package was proven against a real n8n 2.43 and a scratch ProofLedger instance: every operation above, trigger registration on activation, a forged and an unsigned delivery refused with 401, and a signed test event and a real anchored-proof event each starting an execution. The harness lives in `e2e/` and depends on a local ProofLedger checkout, so it is not part of `npm test`.
 
 ## License
