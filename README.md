@@ -38,7 +38,7 @@ The credential test calls `GET /api/v1/branding`, which costs nothing and proves
 
 **External ID.** Send your own record ID on create (*Additional Fields → External ID*). Sending the same one again returns the existing proof instead of creating another, so retries are safe.
 
-**Errors.** Turn on *Continue On Fail* to get `{ "error": "..." }` items instead of a stopped workflow. A `429` means the key's 120 requests per minute or the plan's monthly proof allowance (Free 25, Professional 500, Business 5,000) is used up; the message says which.
+**Errors.** Turn on *Continue On Fail* to get `{ "error": "..." }` items instead of a stopped workflow. A `429` means the key's 120 requests per minute is used up, or, on Free, its 100 API proofs a month (until the 1st of the next month, UTC); the message says which. Developer (1,000 a month) and Platform (10,000) do not stop at their allowance: each proof past it costs $0.01.
 
 ## Trigger
 
@@ -60,7 +60,7 @@ Two importable workflows in [`templates/`](templates/):
 
 ## Facts worth knowing
 
-- One chain: every proof is one transaction on Polygon, usually confirmed within a minute. Nothing to pay per proof.
+- One chain: every proof is one transaction on Polygon, usually confirmed within a minute. Plans and prices: https://proofledger.io/pricing.html.
 - A proof shows that a file with this fingerprint existed by a date. It does not prove who made it and is not a copyright registration.
 - Anyone can verify a proof without an account: the public verify page, the public verify endpoint, or the `verify-proof` package offline from the bundle.
 - API reference: https://proofledger.io/api.html. Changelog: https://proofledger.io/changelog. Terms for API use: https://proofledger.io/api-terms.
