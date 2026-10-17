@@ -11,7 +11,7 @@
     },
     {
       "parameters": {
-        "fileSelector": "/data/evidence.pdf",
+        "fileSelector": "/data/report.pdf",
         "options": {}
       },
       "id": "4b4f9c2e-1a5d-4f0e-9d2b-7a8c3e5f1a02",
@@ -35,7 +35,7 @@
       "type": "n8n-nodes-proofledger.proofLedger",
       "typeVersion": 1,
       "position": [440, 0],
-      "notes": "Hashes the file inside n8n and sends only the SHA-256. External ID = the file name, so running this twice on the same file returns the same proof."
+      "notes": "Hashes the file inside n8n and sends the SHA-256, with the file name as label and External ID. The file itself is never sent. Re-running on an unchanged file returns its existing proof. If the file changed but kept its name, you get its old proof back, so rename it or use the hash as the External ID."
     },
     {
       "parameters": {

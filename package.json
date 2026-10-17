@@ -1,6 +1,6 @@
 {
 	"name": "n8n-nodes-proofledger",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "n8n community node for ProofLedger: anchor a file's SHA-256 hash on the Polygon blockchain, read proofs back, and start workflows when a proof is anchored. The file never leaves n8n.",
 	"license": "MIT",
 	"homepage": "https://proofledger.io/platforms",
@@ -11,7 +11,7 @@
 		"timestamp",
 		"sha256",
 		"polygon",
-		"evidence"
+		"timestamping"
 	],
 	"author": {
 		"name": "Craig Solomon",

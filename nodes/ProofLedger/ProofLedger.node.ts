@@ -28,7 +28,7 @@ const proofOperations: INodeProperties[] = [
 				value: 'createFromFile',
 				action: 'Hash a binary file in n8n and anchor the hash',
 				description:
-					'Compute the SHA-256 of a binary field locally and submit only the hash. The file never leaves n8n.',
+					'Compute the SHA-256 of a binary field locally and submit the hash and the file name (set Filename to change it). The file never leaves n8n.',
 			},
 			{
 				name: 'Create From Hash',
@@ -158,7 +158,7 @@ const additionalProofFields: INodeProperties = {
 			type: 'string',
 			default: '',
 			description:
-				'Shown on the certificate. For Create From File it defaults to the binary field’s file name.',
+				'Label stored with the proof. It appears on the public certificate and in your dashboard. For Create From File it defaults to the binary field’s file name.',
 		},
 	],
 };
@@ -171,7 +171,7 @@ const proofFields: INodeProperties[] = [
 		default: '',
 		required: true,
 		placeholder: 'e.g. a1b2c3…  (64 hex characters)',
-		description: 'Hash the file yourself; only the hash is sent',
+		description: 'Hash the file yourself; the file itself is never sent',
 		displayOptions: { show: { resource: ['proof'], operation: ['create', 'createMany', 'verify'] } },
 	},
 	{
@@ -232,7 +232,7 @@ const proofFields: INodeProperties[] = [
 				name: 'anchoredSince',
 				type: 'dateTime',
 				default: '',
-				description: 'Only proofs whose Polygon anchor landed at or after this time',
+				description: 'Only proofs whose Polygon anchor landed after this time',
 			},
 		],
 	},
@@ -294,7 +294,7 @@ export class ProofLedger implements INodeType {
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
 		description:
-			'Anchor a file’s SHA-256 hash on the Polygon blockchain and read proofs back. Only the hash is sent; the file never leaves n8n.',
+			'Anchor a file’s SHA-256 hash on the Polygon blockchain and read proofs back. The file never leaves n8n: only its hash is sent, with a file name (Create From File uses the file’s own) and an External ID if you set one.',
 		defaults: {
 			name: 'ProofLedger',
 		},
