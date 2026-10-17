@@ -80,6 +80,8 @@ jobs:
         with:
           node-version: 'lts/*'
           cache: 'npm'
+          # Same as verify-proof's working npm job; 0.1.1's first run failed ENEEDAUTH without it.
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
         run: 'npm ci'
@@ -97,3 +99,5 @@ jobs:
           npm run release
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          # Shows the OIDC token-exchange answer in the log if trusted publishing is refused.
+          NPM_CONFIG_LOGLEVEL: verbose
