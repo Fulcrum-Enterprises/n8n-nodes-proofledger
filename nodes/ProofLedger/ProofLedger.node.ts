@@ -28,7 +28,7 @@ const proofOperations: INodeProperties[] = [
 				value: 'createFromFile',
 				action: 'Hash a binary file in n8n and anchor the hash',
 				description:
-					'Compute the SHA-256 of a binary field locally and submit the hash and the file name (set Filename to change it). The file never leaves n8n.',
+					'Compute the SHA-256 of a binary field locally and submit the hash and the file name (set Filename to change it, or turn Send File Name off). The file never leaves n8n.',
 			},
 			{
 				name: 'Create From Hash',
@@ -160,6 +160,15 @@ const additionalProofFields: INodeProperties = {
 			description:
 				'Label stored with the proof. It appears on the public certificate and in your dashboard. For Create From File it defaults to the binary field’s file name.',
 		},
+		{
+			displayName: 'Send File Name',
+			name: 'sendFilename',
+			type: 'boolean',
+			default: true,
+			displayOptions: { show: { '/operation': ['createFromFile'] } },
+			description:
+				'Whether to send the binary field’s file name as the proof’s label. Turn off when the name is private: only the hash goes, and the certificate shows no file name. A Filename set above is sent either way.',
+		},
 	],
 };
 
@@ -279,7 +288,9 @@ function asNodeError(this: IExecuteFunctions, error: unknown): Error {
 
 function proofBody(sha256: string, additional: IDataObject, fallbackFilename?: string): IDataObject {
 	const body: IDataObject = { sha256 };
-	const filename = (additional.filename as string) || fallbackFilename;
+	// The file's own name goes unless Send File Name is off (0.1.2); an explicit Filename always goes.
+	const sendFallback = additional.sendFilename !== false;
+	const filename = (additional.filename as string) || (sendFallback ? fallbackFilename : undefined);
 	if (filename) body.filename = filename;
 	if (additional.externalId) body.external_id = additional.externalId;
 	return body;
@@ -294,7 +305,7 @@ export class ProofLedger implements INodeType {
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
 		description:
-			'Anchor a file’s SHA-256 hash on the Polygon blockchain and read proofs back. The file never leaves n8n: only its hash is sent, with a file name (Create From File uses the file’s own) and an External ID if you set one.',
+			'Anchor a file’s SHA-256 hash on the Polygon blockchain and read proofs back. The file never leaves n8n: only its hash is sent, with a file name (Create From File uses the file’s own unless Send File Name is off) and an External ID if you set one.',
 		defaults: {
 			name: 'ProofLedger',
 		},

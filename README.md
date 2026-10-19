@@ -2,7 +2,7 @@
 
 An [n8n](https://n8n.io) community node for [ProofLedger](https://proofledger.io): anchor a file's SHA-256 hash on the Polygon blockchain from any workflow, read proofs back, and start workflows the moment a proof is anchored.
 
-Only the hash is sent, plus a file name and External ID when the node has them (Create From File sends the binary's file name unless you set Filename). The file never leaves n8n.
+Only the hash is sent, plus a file name and External ID when the node has them (Create From File sends the binary's file name unless you set Filename or turn Send File Name off). The file never leaves n8n.
 
 ## Install
 
@@ -25,7 +25,7 @@ The credential test calls `GET /api/v1/branding`, which costs nothing and proves
 
 | Resource | Operation | What it does |
 |---|---|---|
-| Proof | **Create From File** | Hashes a binary field locally with SHA-256 and submits the hash. Filename defaults to the binary's file name. |
+| Proof | **Create From File** | Hashes a binary field locally with SHA-256 and submits the hash. Filename defaults to the binary's file name; turn Send File Name off to send the hash alone. |
 | Proof | **Create From Hash** | Submits a 64-character SHA-256 hex digest you already have. |
 | Proof | **Create Many** | Every incoming item's hash, in batches of 100, one request per batch. Output is one item per input (`result`: `created`, `exists` or `invalid`, plus the proof). |
 | Proof | **Get** | Status, Polygon transaction and certificate links by proof ID. |
@@ -38,7 +38,7 @@ The credential test calls `GET /api/v1/branding`, which costs nothing and proves
 
 **External ID.** Send your own record ID on create (*Additional Fields → External ID*). Sending the same one again returns the existing proof instead of creating another, so retries are safe.
 
-**Filename.** Stored with the proof. It appears on the public certificate and in your dashboard, so set Filename to something else if the real name is private.
+**Filename.** Stored with the proof. It appears on the public certificate and in your dashboard, so set Filename to something else if the real name is private, or turn **Send File Name** off (Create From File, since 0.1.2) to send only the hash; the certificate then shows no file name.
 
 **Errors.** Turn on *Continue On Fail* to get `{ "error": "..." }` items instead of a stopped workflow. A `429` means the key's 120 requests per minute is used up, or, on Free, its 100 API proofs a month (until the 1st of the next month, UTC); the message says which. Developer (1,000 a month) and Platform (10,000) do not stop at their allowance: each proof past it costs $0.01.
 
